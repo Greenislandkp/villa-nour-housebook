@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Villa Nour — Your Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mrs+Saint+Delafield&family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f7efe4;
+    --card:#ffffff;
+    --tile:#f0e4d3;
+    --tile-border:#e6d6bd;
+    --ink:#231f1a;
+    --ink-soft:#8a8378;
+    --line:#e9decb;
+    --accent:#c99a5b;
+    --danger:#a1503a;
+    --danger-bg:#f3e3d6;
+    --ok:#3f6b52;
+    --radius:18px;
+    --shadow:0 10px 30px rgba(80,60,30,0.08);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.55;
+    overflow-x:hidden;
+    position:relative;
+  }
+  /* soft decorative blobs like the reference mockups */
+  body::before, body::after{
+    content:"";
+    position:fixed;
+    width:280px;height:280px;
+    border-radius:50%;
+    filter:blur(60px);
+    opacity:0.35;
+    z-index:0;
+    pointer-events:none;
+  }
+  body::before{ background:#e9c9a8; top:-80px; left:-90px; }
+  body::after{ background:#d9c9e0; bottom:-100px; right:-90px; }
+
+  .app{
+    position:relative;
+    max-width:460px;
+    margin:0 auto;
+    min-height:100vh;
+    z-index:1;
+    padding-bottom:110px;
+  }
+
+  img{max-width:100%;display:block;border-radius:14px;}
+  a{color:inherit;}
+
+  .placeholder{
+    color:var(--danger);
+    background:var(--danger-bg);
+    padding:1px 6px;
+    border-radius:6px;
+    font-weight:600;
+    font-size:0.92em;
+  }
+
+  /* ---------- SCREENS ---------- */
+  .screen{display:none;padding:34px 22px 10px;}
+  .screen.active{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  /* HOME */
+  #home{padding-top:44px;text-align:center;}
+  .lang-switch{
+    display:inline-flex;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:4px;
+    gap:2px;
+    margin-bottom:26px;
+  }
+  .lang-switch button{
+    border:none;background:transparent;color:var(--ink);
+    padding:6px 16px;border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;opacity:0.5;
+  }
+  .lang-switch button.active{background:var(--ink);color:#fff;opacity:1;}
+
+  .script{
+    font-family:'Mrs Saint Delafield',cursive;
+    font-size:44px;
+    color:var(--ink);
+    margin:0;
+    line-height:1;
+  }
+  .home-sub{
+    text-transform:uppercase;
+    letter-spacing:0.2em;
+    font-size:12px;
+    color:var(--ink-soft);
+    margin:10px 0 0;
+    font-weight:600;
+  }
+  .home-villa{
+    font-family:'DM Serif Display',serif;
+    font-size:15px;
+    letter-spacing:0.04em;
+    margin:2px 0 26px;
+  }
+
+  .tile-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+    text-align:left;
+  }
+  .tile{
+    background:var(--tile);
+    border:1px solid var(--tile-border);
+    border-radius:16px;
+    aspect-ratio:1/1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    cursor:pointer;
+    padding:8px 4px;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .tile:active{transform:scale(0.95);}
+  .tile svg{width:24px;height:24px;stroke:var(--ink);}
+  .tile span{
+    font-size:10.5px;
+    font-weight:600;
+    text-align:center;
+    letter-spacing:0.01em;
+    line-height:1.2;
+    color:var(--ink);
+  }
+
+  /* URGENT strip on home */
+  .home-urgent{
+    margin-top:24px;
+    background:var(--danger-bg);
+    border:1px solid #e6c8b6;
+    border-radius:14px;
+    padding:12px 16px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    gap:7px;
+  }
+  .home-urgent b{
+    color:var(--danger);
+    font-size:11px;
+    letter-spacing:0.02em;
+  }
+  .home-urgent p{
+    margin:-3px 0 0;
+    font-size:10.5px;
+    color:var(--ink-soft);
+  }
+  .home-urgent-actions{
+    display:flex;
+    gap:8px;
+    width:100%;
+  }
+  .home-urgent-actions a{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+    color:#fff;
+    background:var(--danger);
+    font-weight:600;
+    font-size:10.5px;
+    text-decoration:none;
+    padding:8px 6px;
+    border-radius:10px;
+  }
+  .home-urgent-actions a.outline{
+    background:transparent;
+    color:var(--danger);
+    border:1px solid var(--danger);
+  }
+  .home-urgent-actions svg{width:12px;height:12px;stroke:currentColor;flex-shrink:0;}
+
+  /* SUB-SCREEN HEADER */
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:0.18em;
+    font-size:11px;
+    color:var(--ink-soft);
+    font-weight:700;
+    margin:0 0 6px;
+  }
+  .hero-title{
+    font-family:'DM Serif Display',serif;
+    font-size:30px;
+    font-weight:400;
+    margin:0 0 18px;
+    line-height:1.15;
+  }
+  .hero-title .script-accent{
+    font-family:'Mrs Saint Delafield',cursive;
+    font-size:0.9em;
+    display:block;
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px;
+    box-shadow:var(--shadow);
+    margin-bottom:14px;
+  }
+  .card h3{
+    font-family:'DM Serif Display',serif;
+    font-size:18px;
+    font-weight:400;
+    letter-spacing:0.01em;
+    margin:0 0 14px;
+    padding-bottom:12px;
+    color:var(--ink);
+    border-bottom:1px solid var(--line);
+    position:relative;
+  }
+  .card h3::after{
+    content:"";
+    position:absolute;
+    left:0;bottom:-1px;
+    width:28px;height:2px;
+    background:var(--accent);
+  }
+  .card .kicker{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    color:var(--ink-soft);
+    font-weight:700;
+    margin:0 0 2px;
+  }
+
+  /* numbered rank badge for ordered lists (closest → furthest) */
+  .li-num{
+    width:26px;height:26px;flex-shrink:0;
+    border-radius:50%;
+    background:var(--tile);
+    border:1px solid var(--tile-border);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'DM Serif Display',serif;
+    font-size:13px;
+    color:var(--ink);
+  }
+
+  .list-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .list-item:last-child{border-bottom:none;}
+  .list-item .li-icon{
+    width:30px;height:30px;flex-shrink:0;
+    border-radius:50%;
+    background:var(--tile);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .list-item .li-icon svg{width:15px;height:15px;stroke:var(--ink);}
+  .list-item .li-text{flex:1;min-width:0;}
+  .list-item .li-text b{display:block;font-size:14px;margin-bottom:2px;}
+  .list-item .li-text span{font-size:13.5px;color:var(--ink-soft);}
+
+  .map-btn{
+    flex-shrink:0;
+    width:30px;height:30px;
+    border-radius:50%;
+    background:var(--tile);
+    border:1px solid var(--tile-border);
+    display:flex;align-items:center;justify-content:center;
+    text-decoration:none;
+  }
+  .map-btn svg{width:14px;height:14px;stroke:var(--ink);}
+  .map-btn:active{background:var(--ink);}
+  .map-btn:active svg{stroke:#fff;}
+
+  .kv{
+    display:flex;justify-content:space-between;gap:14px;
+    padding:10px 0;border-bottom:1px solid var(--line);font-size:14px;
+  }
+  .kv:last-child{border-bottom:none;}
+  .kv .k{color:var(--ink-soft);}
+  .kv .v{font-weight:600;text-align:right;}
+
+  .btn{
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    background:var(--ink);color:#fff;text-decoration:none;
+    font-weight:600;padding:14px;border-radius:12px;font-size:14.5px;
+    margin-top:10px;
+  }
+  .btn.outline{
+    background:transparent;color:var(--ink);border:1px solid var(--ink);
+  }
+
+  .checklist{list-style:none;margin:0;padding:0;}
+  .checklist li{
+    display:flex;gap:10px;align-items:flex-start;
+    padding:10px 0;border-bottom:1px solid var(--line);font-size:14px;
+  }
+  .checklist li:last-child{border-bottom:none;}
+  .checklist li .tick{
+    width:18px;height:18px;border-radius:50%;background:var(--ok);
+    flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;
+  }
+  .checklist li .tick svg{width:10px;height:10px;stroke:#fff;stroke-width:3;}
+  .checklist li .cross{
+    width:18px;height:18px;border-radius:50%;background:var(--danger);
+    flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;
+  }
+  .checklist li .cross svg{width:10px;height:10px;stroke:#fff;stroke-width:3;}
+
+  .rest-card{display:flex;gap:12px;margin-bottom:12px;}
+  .rest-card .thumb{
+    width:64px;height:64px;border-radius:12px;background:var(--tile);
+    flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    font-size:10px;color:var(--ink-soft);text-align:center;
+  }
+  .rest-card .info b{display:block;font-size:14.5px;margin-bottom:2px;}
+  .rest-card .info span{font-size:13px;color:var(--ink-soft);display:block;margin-bottom:6px;}
+  .rest-card .info a.mini{font-size:12px;font-weight:700;border-bottom:1px solid var(--ink);text-decoration:none;}
+
+  .stars{font-size:22px;letter-spacing:4px;color:var(--accent);text-align:center;margin:6px 0 14px;}
+
+  /* CONTACT LIST — clean tappable rows for directories */
+  .contact-list{list-style:none;margin:0;padding:0;}
+  .contact-list li{border-bottom:1px solid var(--line);}
+  .contact-list li:last-child{border-bottom:none;}
+  .contact-list li a{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:13px 2px;
+    font-size:14.5px;font-weight:600;color:var(--ink);
+    text-decoration:none;
+  }
+  .contact-list li a::after{
+    content:"↗";
+    color:var(--ink-soft);
+    font-weight:400;
+    font-size:13px;
+    flex-shrink:0;
+  }
+  .subnav{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin:-6px 0 18px;
+  }
+  .subnav a{
+    display:inline-block;
+    text-decoration:none;
+    color:var(--ink);
+    background:var(--card);
+    border:1px solid var(--line);
+    padding:7px 13px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:600;
+  }
+  .subnav a:active{background:var(--tile);}
+
+  .jump-link{
+    display:inline-block;
+    font-size:12.5px;font-weight:700;
+    color:var(--ink);
+    text-decoration:none;
+    border-bottom:1px solid var(--ink);
+    margin-top:2px;
+  }
+
+  .badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px;justify-content:center;}
+  .badge{
+    font-size:12px;font-weight:600;padding:6px 12px;border-radius:999px;
+    background:var(--tile);border:1px solid var(--tile-border);
+  }
+  .badge.no{background:var(--danger-bg);border-color:#e6c8b6;color:var(--danger);}
+
+  .avatar{
+    width:64px;height:64px;border-radius:50%;background:var(--tile);
+    display:flex;align-items:center;justify-content:center;margin:0 auto 14px;
+    font-size:10px;color:var(--ink-soft);text-align:center;
+  }
+
+  /* MENU / HOME BUTTON */
+  .menu-btn{
+    position:fixed;
+    left:50%;
+    bottom:22px;
+    transform:translateX(-50%);
+    width:52px;height:52px;
+    border-radius:50%;
+    background:var(--ink);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 8px 20px rgba(35,31,26,0.3);
+    z-index:50;
+    cursor:pointer;
+    border:none;
+  }
+  .menu-btn.show{display:flex;}
+  .menu-btn svg{width:20px;height:20px;stroke:#fff;}
+
+  .note{font-size:12px;color:var(--ink-soft);margin-top:8px;}
+
+  /* SEASONS CHART */
+  .season-chart{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:5px;
+    height:150px;
+    padding:0 2px;
+  }
+  .season-chart .bar-col{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-end;
+    flex:1;
+    height:100%;
+  }
+  .season-chart .temp-label{
+    font-size:9.5px;
+    color:var(--ink-soft);
+    margin-bottom:5px;
+    white-space:nowrap;
+  }
+  .season-chart .bar{
+    width:100%;
+    max-width:20px;
+    border-radius:7px;
+    margin:0 auto;
+  }
+  .season-chart .month-label{
+    font-size:10.5px;
+    color:var(--ink);
+    font-weight:600;
+    margin-top:8px;
+    letter-spacing:0.3px;
+  }
+  .season-legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px 16px;
+    margin-top:16px;
+    justify-content:center;
+  }
+  .season-legend .legend-item{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:11.5px;
+    color:var(--ink-soft);
+  }
+  .season-legend .dot{
+    width:9px;height:9px;border-radius:50%;flex-shrink:0;
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ============ HOME ============ -->
+  <section id="home" class="screen active">
+    <div class="lang-switch">
+      <button class="active">EN</button>
+      <button disabled title="Coming soon">FR</button>
+    </div>
+    <p class="script">Your Guide</p>
+    <p class="home-sub">to</p>
+    <p class="home-villa">VILLA NOUR, KOH PHANGAN</p>
+    <p style="font-size:11.5px;color:var(--ink-soft);text-align:center;margin:8px 0 20px;max-width:260px;margin-left:auto;margin-right:auto;">Welcome home, even if just for a few days. This little guide has everything you need to feel right at ease at Villa Nour.</p>
+
+    <div class="tile-grid">
+      <div class="tile" onclick="showScreen('checkin')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="12" r="4"/><path d="M12 12h9"/><path d="M17 12v4"/><path d="M20 12v3"/></svg>
+        <span>Check In/Out</span>
+      </div>
+      <div class="tile" onclick="showScreen('amenities')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18v-4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M4 18h16v2H4z"/><path d="M6 12V8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v4"/></svg>
+        <span>Amenities</span>
+      </div>
+      <div class="tile" onclick="showScreen('directions')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg>
+        <span>Directions</span>
+      </div>
+      <div class="tile" onclick="showScreen('wifi')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8.5a16 16 0 0 1 20 0"/><path d="M5.5 12.5a11 11 0 0 1 13 0"/><path d="M9 16.5a5.5 5.5 0 0 1 6 0"/><circle cx="12" cy="19.5" r="1"/></svg>
+        <span>Wi-Fi</span>
+      </div>
+      <div class="tile" onclick="showScreen('transport')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="12" rx="2"/><path d="M4 12h16"/><circle cx="8" cy="19" r="1.4"/><circle cx="16" cy="19" r="1.4"/></svg>
+        <span>Transport</span>
+      </div>
+      <div class="tile" onclick="showScreen('know')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="8" r="0.9" fill="var(--ink)" stroke="none"/></svg>
+        <span>Things to Know</span>
+      </div>
+      <div class="tile" onclick="showScreen('todo')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <span>Things to Do</span>
+      </div>
+      <div class="tile" onclick="showScreen('eat')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v8a2 2 0 0 0 4 0V2"/><path d="M8 10v12"/><path d="M17 2c-1.5 0-3 1.6-3 5s1.5 5 3 5v10"/></svg>
+        <span>Places to Eat</span>
+      </div>
+      <div class="tile" onclick="showScreen('drink')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l-2 9a4 4 0 0 1-8 0L6 3z"/><path d="M12 14v7"/><path d="M8 21h8"/></svg>
+        <span>Places to Drink</span>
+      </div>
+      <div class="tile" onclick="showScreen('nightlife')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        <span>Parties &amp; Clubs</span>
+      </div>
+      <div class="tile" onclick="showScreen('rules')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M6 6l12 12"/></svg>
+        <span>House Rules</span>
+      </div>
+      <div class="tile" onclick="showScreen('emergency')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+        <span>Emergency</span>
+      </div>
+      <div class="tile" onclick="showScreen('directory')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-3-6 3V3z"/></svg>
+        <span>Local Directory</span>
+      </div>
+      <div class="tile" onclick="showScreen('coworking')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/><path d="M8 6V4h8v2"/></svg>
+        <span>Coworking Spaces</span>
+      </div>
+      <div class="tile" onclick="showScreen('seasons')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg>
+        <span>Seasons &amp; Weather</span>
+      </div>
+    </div>
+
+    <div class="home-urgent">
+      <b>Urgent?</b>
+      <p>Reach your host directly</p>
+      <div class="home-urgent-actions">
+        <a href="https://wa.me/66934343221">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          WhatsApp
+        </a>
+        <a class="outline" href="tel:+66934343221">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5c0 8 7 15 15 15l3-4-6-3-2 2c-2-1-4-3-5-5l2-2-3-6-4 0z"/></svg>
+          Direct Contact
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CHECK IN/OUT ============ -->
+  <section id="checkin" class="screen">
+    <p class="eyebrow">Arrival &amp; Departure</p>
+    <h1 class="hero-title">Check In/Out</h1>
+    <div style="display:flex;justify-content:center;margin:-6px 0 22px;">
+      <div style="width:152px;height:152px;border-radius:50%;background:#fff;border:1px solid var(--tile-border);box-shadow:0 8px 20px rgba(35,31,26,0.1);display:flex;flex-direction:column;align-items:center;justify-content:center;">
+        <span style="font-family:'DM Serif Display',serif;font-size:25px;color:var(--ink);line-height:1.1;">2–7 PM</span>
+        <span style="font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-soft);margin-top:5px;">Check-in window</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="list-item">
+        <div class="li-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="12" r="4"/><path d="M12 12h9"/><path d="M17 12v4"/></svg></div>
+        <div class="li-text"><b>House Access</b><span>Your host welcomes every guest in person, hands over the keys and introduces the villa on arrival — no lockbox or code needed.</span></div>
+      </div>
+      <div class="list-item">
+        <div class="li-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M8 9V7a4 4 0 0 1 8 0v2"/></svg></div>
+        <div class="li-text"><b>Parking</b><span>Free parking, directly accessible from the main road.</span></div>
+      </div>
+      <div class="list-item">
+        <div class="li-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+        <div class="li-text"><b>Your arrival time</b><span>Since your host welcomes you in person, please let us know your expected check-in time at least 24 hours ahead — this helps make sure we're there to greet you properly.</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Getting to the Villa</h3>
+      <p style="font-size:13.5px;margin:0 0 8px;">See the <b>Directions</b> section for the full route and map link. Koh Phangan doesn't have street names — only geographic codes — so Google Maps can sometimes suggest the wrong route. Please use the GPS point and route provided rather than typing the address directly.</p>
+      <p style="font-size:13.5px;margin:0 0 8px;">Please approach the villa via the upper road, not the lower one — the lower road is currently under construction and difficult to use.</p>
+      <p style="font-size:13.5px;margin:0;">If you're taking a taxi, please show the driver the GPS point and route directly, and make sure they take you all the way to the villa.</p>
+    </div>
+
+    <div class="card">
+      <h3>Guest Registration (TM30)</h3>
+      <p style="font-size:13.5px;margin:0 0 8px;">The TM30 is a Thai immigration form that every property owner is required to file, reporting where foreign visitors are staying during their time in Thailand — it's simply part of local regulations, nothing to worry about.</p>
+      <p style="font-size:13.5px;margin:0;">Please send your host a copy of the passport for everyone staying overnight at the villa — this is required for us to complete the registration and meet our legal obligations, so we do need this from each guest.</p>
+    </div>
+
+    <div style="display:flex;justify-content:center;margin:22px 0;">
+      <div style="width:152px;height:152px;border-radius:50%;background:#fff;border:1px solid var(--tile-border);box-shadow:0 8px 20px rgba(35,31,26,0.1);display:flex;flex-direction:column;align-items:center;justify-content:center;">
+        <span style="font-family:'DM Serif Display',serif;font-size:25px;color:var(--ink);line-height:1.1;">11 AM</span>
+        <span style="font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-soft);margin-top:5px;">Check-out time</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Before You Leave</h3>
+      <p style="font-size:13px;color:var(--ink-soft);margin:0 0 12px;">We hope you had a wonderful stay! Just a few small things before you go, so the villa is ready to welcome the next guests with the same care you found on arrival.</p>
+      <ul class="checklist">
+        <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M4 12l5 5L20 6"/></svg></span> Since check-out is done in person, please let your host know your check-out time at least 24 hours ahead</li>
+        <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M4 12l5 5L20 6"/></svg></span> Hand the keys back to your host, who'll pop by to see you off</li>
+        <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M4 12l5 5L20 6"/></svg></span> Take a quick look around for any passport, jewellery or other valuables you might have left behind</li>
+        <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M4 12l5 5L20 6"/></svg></span> Let your host know about any accidental damage — these things happen, we'd just love to know</li>
+        <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M4 12l5 5L20 6"/></svg></span> Turn off the A/C, fans and lights on your way out</li>
+        <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M4 12l5 5L20 6"/></svg></span> Close up the windows and doors</li>
+        <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M4 12l5 5L20 6"/></svg></span> Pop your used towels in the bins provided</li>
+        <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M4 12l5 5L20 6"/></svg></span> Take the trash out to the outdoor bin</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ AMENITIES ============ -->
+  <section id="amenities" class="screen">
+    <p class="eyebrow">Make Yourself at Home</p>
+    <h1 class="hero-title">Amenities</h1>
+    <div class="subnav">
+      <a href="#am-pool">Pool</a>
+      <a href="#am-ac">A/C</a>
+      <a href="#am-kitchen">Kitchen</a>
+      <a href="#am-waste">Waste</a>
+      <a href="#am-water">Water</a>
+      <a href="#am-tv">TV</a>
+      <a href="#am-safes">Safes</a>
+      <a href="#am-keys">Spare Keys</a>
+      <a href="#am-fire">Fire Extinguishers</a>
+      <a href="#am-blinds">Sun Blind</a>
+    </div>
+    <div class="card" id="am-pool">
+      <h3>Pool</h3>
+      <p style="font-size:13.5px;margin:0 0 8px;">Open 24 hours. It's a saltwater pool, gentler on the skin and eyes than a chlorine one. The pool lights come on automatically between 7 PM and 11 PM.</p>
+      <p style="font-size:13.5px;margin:0 0 8px;">For everyone's safety, please make sure children are supervised at all times.</p>
+      <p style="font-size:13.5px;margin:0;">Our pool team comes twice a week to check the water quality and carry out any necessary maintenance on the filtration system.</p>
+    </div>
+    <div class="card" id="am-ac">
+      <h3>Air conditioning</h3>
+      <p style="font-size:13.5px;margin:0 0 8px;">There are 4 air conditioning units — one in each bedroom and one in the living room. Each unit has its own remote control.</p>
+      <p style="font-size:13.5px;margin:0;">We kindly ask you to please turn off the A/C units whenever no one is home. It helps save energy and avoids putting unnecessary strain on the units, which could lead to breakdowns. Thank you for your understanding!</p>
+    </div>
+    <div class="card" id="am-kitchen">
+      <h3>Kitchen</h3>
+      <p style="font-size:13.5px;margin:0;">The kitchen is fully equipped with: refrigerator, freezer, microwave, toaster, blender, hot water kettle, French press coffee maker, cooking basics (pots, pans, oil, salt &amp; pepper), dishes &amp; silverware, wine glasses, and a dining table.</p>
+    </div>
+    <div class="card" id="am-waste">
+      <h3>Waste Management</h3>
+      <p style="font-size:13.5px;margin:0 0 8px;">Small bins are located under the gas hob, and a larger bin is available under the main staircase. The outdoor bin should stay outside the house.</p>
+      <p style="font-size:13.5px;margin:0 0 8px;">To help keep pests, ants and other unwanted visitors away, we kindly ask that you don't leave food out and make sure to take out the trash promptly.</p>
+      <p style="font-size:13.5px;margin:0;">The bins are emptied every two days.</p>
+    </div>
+    <div class="card" id="am-water">
+      <h3>Drinking water</h3>
+      <p style="font-size:13.5px;margin:0;">Tap water is not drinkable. Please use the bottled water provided at check-in, or the water dispenser next to the fridge. Replacement bottles for the dispenser are kept outside, under the stairs by the main entrance.</p>
+    </div>
+    <div class="card" id="am-tv">
+      <h3>TV &amp; Entertainment</h3>
+      <p style="font-size:13.5px;margin:0 0 8px;">There's a 55" smart TV — you can log into your usual streaming platforms with your own account. Just a kind reminder to log out before you leave.</p>
+      <p style="font-size:13.5px;margin:0;">There's also a Bluetooth sound system — connect directly from your phone or laptop. If it doesn't pair automatically, press the pairing button on top of the sound bar.</p>
+    </div>
+    <div class="card" id="am-safes">
+      <h3>Safes</h3>
+      <p style="font-size:13.5px;margin:0 0 10px;">Koh Phangan is a generally safe island, but we still provide a safe in each bedroom for your peace of mind, which you can operate with your own personal 6-digit code. Please note that we can't be held responsible for personal belongings in the event of loss or theft.</p>
+      <div class="list-item"><div class="li-text"><b>To close</b><span>Open the safe door, enter a 6-digit number of your choice, then press the "LOCK" (#) key. The word CLOSED will appear.</span></div></div>
+      <div class="list-item"><div class="li-text"><b>To open</b><span>Enter your 6-digit code and the safe will open.</span></div></div>
+      <p style="font-size:13.5px;margin:10px 0 0;font-weight:600;">Important: before check-out, please double-check the safe for any valuables or important documents, such as passports, then leave it open.</p>
+    </div>
+    <div class="card" id="am-keys">
+      <h3>Spare Keys</h3>
+      <p style="font-size:13.5px;margin:0;">If you accidentally lock yourself out or misplace a key, don't worry — spare keys are kept in the dresser in the living room.</p>
+    </div>
+    <div class="card" id="am-fire">
+      <h3>Fire Extinguishers</h3>
+      <p style="font-size:13.5px;margin:0;">There are 2 fire extinguishers in the villa — one on the ground floor, in the hallway next to the bedroom, and one on the first floor, at the end of the hallway, also near the bedroom.</p>
+    </div>
+    <div class="card" id="am-blinds">
+      <h3>Electric Sun Blind</h3>
+      <p style="font-size:13.5px;margin:0;">The electric sun blind near the pool, used to block the sun, can be operated with the remote control provided. In case of strong wind, please make sure the blind is raised to avoid any damage. If you're heading out, please also leave the blind raised — weather on Koh Phangan can change quickly, and strong gusts could damage it while you're away.</p>
+    </div>
+  </section>
+
+  <!-- ============ DIRECTIONS ============ -->
+  <section id="directions" class="screen">
+    <p class="eyebrow">Directions</p>
+    <h1 class="hero-title">Route to<br>Our Villa</h1>
+    <div class="card" style="text-align:center;border-radius:40px;padding:28px 26px;">
+      <p class="eyebrow" style="margin-bottom:4px;">Villa Nour</p>
+      <p style="margin:0;font-family:'DM Serif Display',serif;font-size:17px;color:var(--ink);line-height:1.4;">91/6 Moo 4, Koh Phangan District,<br>84280 Surat Thani Province</p>
+    </div>
+    <div style="display:flex;gap:10px;margin:12px 0 28px;">
+      <a class="btn" style="flex:1;margin-top:0;" href="https://www.google.com/maps?q=9.758854,99.977147">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg>
+        Villa Location
+      </a>
+      <a class="btn outline" style="flex:1;margin-top:0;" href="https://maps.app.goo.gl/pAz8aFVatzHuHAQn7">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20l-5-2V6l5 2m0 12l6-2m-6 2V8m6 10l5 2V4l-5 2m0 12V6m0 2l-6-2"/></svg>
+        Route from Pier
+      </a>
+    </div>
+    <div class="card">
+      <h3>A note on GPS</h3>
+      <p style="font-size:13.5px;margin:0 0 8px;">Coming from Thong Sala Pier, follow the main road north — for the last 50m, take the unpaved road on the right.</p>
+      <p style="font-size:13.5px;margin:0 0 8px;">Koh Phangan doesn't have street names — only geographic codes — so Google Maps can sometimes suggest the wrong route. Please use the GPS point and route above rather than typing the address directly.</p>
+      <p style="font-size:13.5px;margin:0;">Please approach the villa via the upper road, not the lower one — the lower road is currently under construction and difficult to use.</p>
+    </div>
+  </section>
+
+  <!-- ============ WIFI ============ -->
+  <section id="wifi" class="screen">
+    <p class="eyebrow">Stay Connected</p>
+    <h1 class="hero-title">Free Wi-Fi</h1>
+    <div class="card">
+      <div class="kv"><span class="k">Network</span><span class="v">TOTWIFIV1_5G</span></div>
+      <div class="kv"><span class="k">Password</span><span class="v">06AM1253</span></div>
+    </div>
+    <div class="card">
+      <h3>If the Wi-Fi isn't working</h3>
+      <ul class="checklist" style="margin:0;">
+        <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M4 12l5 5L20 6"/></svg></span> Check the modem, located upstairs in the hallway.</li>
+        <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M4 12l5 5L20 6"/></svg></span> If a red light is blinking, please contact your host — they will get in touch with the internet provider.</li>
+        <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M4 12l5 5L20 6"/></svg></span> If all lights show green, unplug the modem, wait 1–2 minutes, then plug it back in and check again.</li>
+      </ul>
+      <p style="font-size:13.5px;margin:12px 0 0;">Please note that since we live on an island, if a technical repair is needed on the provider's side, it can take up to 24 hours to restore the line — thank you for your patience.</p>
+      <p style="font-size:13.5px;margin:10px 0 0;">In the meantime, we can provide a portable 5G modem — it's not as fast as fibre, but it will do the job until the line is repaired. Just ask your host.</p>
+    </div>
+  </section>
+
+  <!-- ============ TRANSPORT ============ -->
+  <section id="transport" class="screen">
+    <p class="eyebrow">Getting Around</p>
+    <h1 class="hero-title">Transport</h1>
+    <div class="card">
+      <div class="list-item">
+        <div class="li-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/></svg></div>
+        <div class="li-text"><b>Getting here by ferry</b><span>There's no airport on Koh Phangan, so you'll arrive by ferry — mainly via Thong Sala Pier (the main terminal, on the west coast, served by Lomprayah, Seatran Discovery, Raja Ferry and Songserm from Koh Samui, Surat Thani and Koh Tao) or Haad Rin Pier on the east coast. From either pier, shared songthaews wait for every ferry and leave once full, dropping passengers off one by one (fixed price, roughly 150–200 THB depending on distance). Private taxis are also available right at the pier for a direct transfer — more expensive (roughly 300–500 THB), but faster. There are no meters, so agree on the price before getting in.</span></div>
+      </div>
+      <div class="list-item">
+        <div class="li-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="12" rx="2"/></svg></div>
+        <div class="li-text"><b>Songthaew / taxi</b><span>There's no Grab, Uber or public bus on the island. Songthaews (shared pickup trucks) can be flagged down from the roadside or found at Thong Sala Pier and major markets — just raise your hand. Motorbike taxis wear vests marked "TAXI". There are no meters, so always agree on the fare with the driver before you start the ride.</span></div>
+      </div>
+      <div class="list-item">
+        <div class="li-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="6" rx="2"/><path d="M5 11l1.5-4h11L19 11"/><circle cx="7.5" cy="17.5" r="1.3"/><circle cx="16.5" cy="17.5" r="1.3"/></svg></div>
+        <div class="li-text"><b>Private taxi</b><span>Relatively expensive since there's no Uber or Grab on the island — most of the time you'll need to book in advance. <a class="jump-link" href="#taxi-bike-contacts">See contacts ↓</a></span></div>
+      </div>
+      <div class="list-item">
+        <div class="li-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17V7h10l4 6v4"/></svg></div>
+        <div class="li-text"><b>Scooter rental</b><span>A valid driving licence is required, a helmet is compulsory, and shops usually keep your passport or a cash deposit until the bike is returned. Three-wheeled scooters are also available for rent on the island — please be aware that they're not officially permitted on the road, even though they're commonly tolerated. In case of an accident, insurance may not cover you, as these are modified three-wheeled vehicles. <a class="jump-link" href="#taxi-bike-contacts">See contacts ↓</a></span></div>
+      </div>
+      <div class="list-item">
+        <div class="li-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="6" rx="2"/><path d="M5 11l1.5-4h11L19 11"/><circle cx="7.5" cy="17.5" r="1.3"/><circle cx="16.5" cy="17.5" r="1.3"/></svg></div>
+        <div class="li-text"><b>Car rental</b><span>Useful for larger groups or day trips further across the island. <a class="jump-link" href="#car-rental-contacts">See agencies ↓</a></span></div>
+      </div>
+    </div>
+
+    <p class="note" style="margin:14px 0 10px;">The contacts below are shared for your convenience only, and we can't guarantee they'll be available at short notice. Unlike many hotels and villas, we don't take a commission on transport bookings, and we're not able to negotiate prices on your behalf.</p>
+
+    <div class="card" id="taxi-bike-contacts">
+      <h3>Taxi &amp; Bike Contacts</h3>
+      <ul class="contact-list">
+        <li><a href="tel:+66872675726">Ms. Nim</a></li>
+        <li><a href="tel:+66880212272">Mr. O</a></li>
+        <li><a href="tel:+66922709987">Mr. Tom</a></li>
+        <li><a href="tel:+66652452545">Taxi Jade</a></li>
+        <li><a href="tel:+66827567582">Mena</a></li>
+        <li><a href="tel:+66611466854">Phangan Taxi</a></li>
+      </ul>
+      <p class="note" style="margin:10px 0 0;">Phangan Taxi specializes in night-out and party runs.</p>
+    </div>
+
+    <div class="card" id="car-rental-contacts">
+      <h3>Car Rental Agencies</h3>
+      <ul class="contact-list">
+        <li><a href="https://kremborentkp.com" target="_blank" rel="noopener">Krembo Car Rental</a></li>
+        <li><a href="https://share.google/qvOgxvhUjbiTcDoRz" target="_blank" rel="noopener">Sangloy Bike and Car Rental</a></li>
+        <li><a href="https://share.google/oQQWQElMlbWzG81zK" target="_blank" rel="noopener">A&amp;M Car Rental</a></li>
+        <li><a href="https://share.google/fZiFleUr5FGeXn5bF" target="_blank" rel="noopener">Nicky Car Rental</a></li>
+        <li><a href="https://kohphangan.org" target="_blank" rel="noopener">Koh Phangan Car Rental</a></li>
+        <li><a href="https://share.google/QQEQI7LDPRsez3F3S" target="_blank" rel="noopener">Sea Mew Bike &amp; Car Rental</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ THINGS TO KNOW ============ -->
+  <section id="know" class="screen">
+    <p class="eyebrow">Good to Know</p>
+    <h1 class="hero-title">Things to Know</h1>
+    <div class="card">
+      <h3>Power Cuts</h3>
+      <p style="font-size:13.5px;margin:0 0 8px;">Power cuts happen from time to time — it's part of island life. You may also occasionally notice power fluctuations, which can affect the lights or A/C. These usually don't last long, and this is outside of our control. We provide flashlights, but there's no generator on site.</p>
+      <p style="font-size:13.5px;margin:0;">If a power cut or fluctuation lasts more than an hour, please check the fuse box shown to you during check-in. If it still hasn't resolved after an hour, let us know so we can look into it and check with the local authorities in case of a wider issue on the power lines.</p>
+    </div>
+
+    <div class="card">
+      <h3>Local Wildlife</h3>
+      <p style="font-size:13.5px;margin:0 0 8px;">As with any tropical environment, you may come across local wildlife such as ants, mosquitoes, spiders and geckos. We maintain high cleaning and pest-control standards and will happily share tips to help keep nature's little visitors outside where they belong.</p>
+      <p style="font-size:13.5px;margin:0 0 8px;">Mosquitoes are most active around sunset, for about an hour — mosquito coils are provided at the villa to help keep them away.</p>
+      <p style="font-size:13.5px;margin:0;">Between March and July, after heavy monsoon rain, you may occasionally see swarms of small flying insects known locally as "malaeng mao" (flying termites) appear at nightfall — sometimes in the hundreds. They're completely harmless, but they're drawn to bright light. If this happens, simply turn off the lights inside and leave an outside light on instead — the insects will head there and move on within a little while.</p>
+    </div>
+
+    <div class="card">
+      <h3>Getting Around the Island</h3>
+      <p style="font-size:13.5px;margin:0 0 8px;">There's no Grab, Uber or similar app on Koh Phangan, so private taxis can be relatively expensive — this is why most visitors choose to rent a scooter or a car to get around. See the <b>Transport</b> section for rental contacts and songthaew (shared taxi) info.</p>
+      <p style="font-size:13.5px;margin:0;">If you're not comfortable riding a scooter, it's best to stick to public songthaews or private taxis instead — there's no shame in it, and it's by far the safest choice.</p>
+    </div>
+    <div class="card">
+      <h3>Road Safety</h3>
+      <p style="font-size:13.5px;margin:0 0 8px;">If you're planning to ride a scooter during your stay, please always wear a helmet and make sure you're carrying a valid driving licence (ideally an international driving permit, or a Thai licence) — this is required by law and is also usually a condition of your travel insurance in case of an accident.</p>
+      <p style="font-size:13.5px;margin:0 0 8px;">Please take extra care on the roads: some areas of the island are under construction, and stretches of road can be sandy, uneven or poorly lit, especially away from the main routes.</p>
+      <p style="font-size:13.5px;margin:0;">Roads also get busier during high season and around parties and festivals — if you're planning a night out, we'd strongly recommend booking a taxi rather than driving back.</p>
+    </div>
+
+    <div class="card">
+      <h3>Being Prepared for an Emergency</h3>
+      <p style="font-size:13.5px;margin:0 0 8px;">You're on holiday, and we hope you make the most of it! That said, accidents can happen from time to time, so it's worth taking a moment to look over the <b>Emergency</b> section of this guide so you feel prepared, just in case.</p>
+      <p style="font-size:13.5px;margin:0;">We'd also recommend keeping any information you might need in an emergency — such as your insurance details and emergency contacts — somewhere easily accessible during your stay.</p>
+    </div>
+
+    <div class="card">
+      <h3>A Little Thai Culture Etiquette</h3>
+      <p style="font-size:13.5px;margin:0 0 10px;">Thailand has a rich and welcoming culture, and a few small gestures go a long way in showing respect during your stay.</p>
+      <p style="font-size:13px;font-weight:700;margin:0 0 4px;color:var(--ok);">Do</p>
+      <ul class="checklist" style="margin-bottom:14px;">
+        <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M4 12l5 5L20 6"/></svg></span> Remove your shoes before entering temples and most homes.</li>
+        <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M4 12l5 5L20 6"/></svg></span> Dress modestly when visiting temples — shoulders and knees covered.</li>
+        <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M4 12l5 5L20 6"/></svg></span> Greet with a "wai" (a slight bow with palms pressed together) — it's a lovely way to show respect, though a smile and nod are always welcome too.</li>
+        <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M4 12l5 5L20 6"/></svg></span> Speak softly and stay calm in public — raised voices are seen as a loss of face and can attract unwanted attention.</li>
+        <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M4 12l5 5L20 6"/></svg></span> Show respect for the monarchy and images of Buddha, including on temple grounds and in everyday conversation.</li>
+      </ul>
+      <p style="font-size:13px;font-weight:700;margin:0 0 4px;color:var(--danger);">Don&rsquo;t</p>
+      <ul class="checklist" style="margin:0;">
+        <li><span class="cross"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M6 6l12 12M18 6L6 18"/></svg></span> Avoid touching someone's head or pointing your feet at people, monks, or Buddha images — the head is considered sacred, the feet the opposite.</li>
+        <li><span class="cross"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M6 6l12 12M18 6L6 18"/></svg></span> Avoid raising your voice or losing your temper in public — it rarely helps and is culturally frowned upon.</li>
+        <li><span class="cross"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M6 6l12 12M18 6L6 18"/></svg></span> Keep public displays of affection low-key.</li>
+        <li><span class="cross"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M6 6l12 12M18 6L6 18"/></svg></span> Never step on Thai currency — the King's image appears on it, so this is considered highly disrespectful.</li>
+        <li><span class="cross"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M6 6l12 12M18 6L6 18"/></svg></span> Avoid sitting or standing higher than monks, and note that women should not touch a monk or hand him something directly.</li>
+        <li><span class="cross"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M6 6l12 12M18 6L6 18"/></svg></span> Being shirtless or wearing beach attire (swimwear, bikinis) is best kept to the beach itself — please dress a little more modestly when visiting shops or other public places.</li>
+      </ul>
+      <p style="font-size:13.5px;margin:10px 0 0;font-style:italic;color:var(--ink-soft);">Locals genuinely appreciate the effort — nobody expects perfection, just a bit of mindfulness!</p>
+    </div>
+
+  </section>
+
+  <!-- ============ THINGS TO DO ============ -->
+  <section id="todo" class="screen">
+    <p class="eyebrow">Explore</p>
+    <h1 class="hero-title">Things to Do</h1>
+    <p class="note" style="margin:-8px 0 10px;">Ordered from closest to furthest from the villa.</p>
+    <div class="subnav">
+      <a href="#todo-archery">Archery</a>
+      <a href="#todo-beaches">Beaches</a>
+      <a href="#todo-diving">Diving &amp; Snorkeling</a>
+      <a href="#todo-festivals">Festivals</a>
+      <a href="#todo-gyms">Gyms</a>
+      <a href="#todo-climbing">Indoor Climbing</a>
+      <a href="#todo-islandhopping">Island Hopping</a>
+      <a href="#todo-jetski">Jet Ski</a>
+      <a href="#todo-kitesurf">Kitesurfing</a>
+      <a href="#todo-markets">Local Markets</a>
+      <a href="#todo-massage">Massage</a>
+      <a href="#todo-muaythai">Muay Thai</a>
+      <a href="#todo-paddle">Padel</a>
+      <a href="#todo-shopping">Shopping</a>
+      <a href="#todo-sup">SUP &amp; Kayak</a>
+      <a href="#todo-temples">Temples</a>
+      <a href="#todo-cooking">Thai Cooking Classes</a>
+      <a href="#todo-treks">Treks</a>
+      <a href="#todo-viewpoints">Viewpoints</a>
+      <a href="#todo-waterfalls">Waterfalls</a>
+      <a href="#todo-wellness">Wellness</a>
+      <a href="#todo-yoga">Yoga</a>
+    </div>
+
+    <div class="card" id="todo-archery">
+      <h3>Archery</h3>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>First Bow &amp; Arrow Club</b><span>Ratcharoen Road — archery lessons for all levels (15/30/60 min), equipment included, on-site bar. Daily, 10 AM–5:30 PM</span></div><a class="map-btn" href="https://share.google/tap7yvN5qObQOLWkk" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    </div>
+
+    <div class="card" id="todo-beaches">
+      <h3>Beaches</h3>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>Hin Kong Beach</b><span>The closest — right in the Wok Tum/Sri Thanu bay, known for calm shallow waters and beautiful sunsets</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Hin%20Kong%20Beach%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>Zen Beach / Pirate Beach</b><span>Right at Sri Thanu, a few minutes from the villa</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Zen%20Beach%20/%20Pirate%20Beach%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">3</div><div class="li-text"><b>Haad Yao</b><span>Long white sand beach, just north of Sri Thanu</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Haad%20Yao%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">4</div><div class="li-text"><b>Salad Beach</b><span>Sheltered cove, a little further north</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Salad%20Beach%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">5</div><div class="li-text"><b>Mae Haad Beach</b><span>Northwestern tip, famous sandbar to Koh Ma island</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Mae%20Haad%20Beach%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">6</div><div class="li-text"><b>Secret Beach / Haad Khom</b><span>Further north, near Koh Raham</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Secret%20Beach%20/%20Haad%20Khom%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">7</div><div class="li-text"><b>Malibu Beach</b><span>West side of Chaloklum Bay — quiet cove with mountain views, roughly 20–30 min from the villa</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Malibu%20Beach%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">8</div><div class="li-text"><b>Bottle Beach (Haad Khuat)</b><span>Remote northeast beach reachable only by longtail boat from Chaloklum (~15 min) or a 1.5–2 hour jungle trek — well worth the effort</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Bottle%20Beach%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">9</div><div class="li-text"><b>Haad Rin Beach</b><span>On the southeastern tip of the island, furthest from the villa (about 45 min–1 hour) — famous as the Full Moon Party beach</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Haad%20Rin%20Beach%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    </div>
+
+    <div class="card" id="todo-diving">
+      <h3>Diving &amp; Snorkeling</h3>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>Haad Yao Divers</b><span>Haad Yao Beach, just north of Sri Thanu — PADI 5 Star center, small-group boat trips (max 4 divers/guide), snorkeling trips, night dives with bioluminescent plankton</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Haad%20Yao%20Divers%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>Reefer's Dive Resort</b><span>Haad Yao, inside Sandy Bay Resort — recreational dives and snorkeling trips, beginner-friendly (ages 8+)</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Reefer%27s%20Dive%20Resort%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">3</div><div class="li-text"><b>Chaloklum Diving</b><span>Chaloklum — PADI 5 Star center with 25+ years of experience, small groups (max 4 per instructor)</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Chaloklum%20Diving%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">4</div><div class="li-text"><b>Sail Rock Divers</b><span>Chaloklum — PADI 5 Star Resort with on-site pool, classrooms and its own 16m dive boat</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Sail%20Rock%20Divers%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">5</div><div class="li-text"><b>Lotus Diving</b><span>Chaloklum — SSI Teacher Training Centre, active in coral restoration and reef clean-ups</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Lotus%20Diving%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    </div>
+
+    <div class="card" id="todo-festivals">
+      <h3>Festivals</h3>
+      <div class="list-item"><div class="li-text"><b>Songkran — mid-April (13th–15th)</b><span>Thailand's New Year, celebrated with a lively water fight around Thong Sala Pier — roads close to traffic and a DJ party takes over the afternoon. Note that most shops and restaurants close for the day.</span></div></div>
+      <div class="list-item"><div class="li-text"><b>Loy Krathong — November, on the full moon</b><span>One of Thailand's most beautiful festivals: locals and visitors gather (often at Baan Tai pier) to release candle-lit krathong offerings into the sea and float paper lanterns into the sky, alongside food stalls, music and fireworks.</span></div></div>
+      <p style="font-size:12px;color:var(--ink-soft);margin:10px 0 0;">See the <b>Parties &amp; Clubs</b> section for the island's Full Moon, Half Moon and other beach party events.</p>
+    </div>
+
+    <div class="card" id="todo-gyms">
+      <h3>Gyms</h3>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>Xantiva</b><span>Hin Kong Rd — the closest, a wellness &amp; fitness center with gym equipment, yoga, sauna and ice bath</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Xantiva%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>Evolve Health Club</b><span>Right in Sri Thanu — open-air gym, yoga, kettlebell training and Muay Thai</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Evolve%20Health%20Club%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">3</div><div class="li-text"><b>The Press Gym &amp; Fitness Club</b><span>Chaloklum — smaller, basic gym equipment</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=The%20Press%20Gym%20%26%20Fitness%20Club%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">4</div><div class="li-text"><b>Phangan Muay Thai &amp; Fitness Gym</b><span>Thong Sala — one of the island's largest, half gym / half Muay Thai training center</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Phangan%20Muay%20Thai%20%26%20Fitness%20Gym%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">5</div><div class="li-text"><b>Diamond Muay Thai</b><span>Nai Wok, near Thong Sala — well-established Muay Thai training camp with full gym facilities</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Diamond%20Muay%20Thai%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">6</div><div class="li-text"><b>Podium Gym</b><span>Modern air-conditioned gym, machines, free weights, juice bar</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Podium%20Gym%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">7</div><div class="li-text"><b>Sabaii Bay Gym</b><span>Ban Tai — open-air gym right on the beach</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Sabaii%20Bay%20Gym%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    </div>
+
+    <div class="card" id="todo-climbing">
+      <h3>Indoor Climbing</h3>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>Upside Bouldering Gym</b><span>Indoor bouldering gym near Chaloklum — beginner-friendly routes, kids zone, coaching available. Daily 9 AM–9 PM</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Upside%20Bouldering%20Gym%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>Grip Climb &amp; Cafe</b><span>Thong Sala — indoor climbing walls paired with an upstairs cafe, routes for all levels, gear provided</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Grip%20Climb%20%26%20Cafe%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    </div>
+
+    <div class="card" id="todo-islandhopping">
+      <h3>Island Hopping</h3>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>Ang Thong National Marine Park</b><span>A protected sanctuary of 42 tropical islands — emerald lagoons, limestone cliffs, snorkeling and kayaking. About 45 minutes by speedboat from Koh Phangan, day tours available with hotel pickup.</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Ang%20Thong%20National%20Marine%20Park%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    </div>
+
+    <div class="card" id="todo-jetski">
+      <h3>Jet Ski</h3>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>Jetski Club KPG</b><span>Ban Tai — jet ski rental, Sea-Doo GTX 155 &amp; RXT-X models, bookings via WhatsApp</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Jetski%20Club%20KPG%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>Phangan Jetski</b><span class="placeholder">Half or full-day jet ski safaris around the island</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Phangan%20Jetski%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">3</div><div class="li-text"><b>Koh Phangan Jet Ski Tour</b><span>Departs from Haad Rin Pier — furthest, guided 2-hour small-group tour</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Haad%20Rin%20Pier%20Koh%20Phangan%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <p class="note" style="margin-top:8px;">Phangan Jetski's exact base location wasn't confirmed online — worth double-checking before sending guests there.</p>
+    </div>
+
+    <div class="card" id="todo-kitesurf">
+      <h3>Kitesurfing</h3>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>Accrokite Koh Phangan</b><span>Thong Sala — closest kite school, IKO-certified instructors, lessons &amp; equipment rental</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Accrokite%20Koh%20Phangan%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>Kiteboarding Asia (KBA)</b><span>Near Ban Tai pier — long-standing school on the island's main kite lagoon, wide flat water, great for beginners</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Kiteboarding%20Asia%20KBA%20Koh%20Phangan%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">3</div><div class="li-text"><b>Kiteflip Kite &amp; Wing Foil Center</b><span>Ban Tai — kitesurfing and wing foil lessons and rental on the flat lagoon</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Kiteflip%20Koh%20Phangan%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">4</div><div class="li-text"><b>Kite Club Koh Phangan</b><span>Ban Tai — IKO-certified school, lessons for all levels</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Kite%20Club%20Koh%20Phangan%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">5</div><div class="li-text"><b>Fly High Kiteboarding</b><span>Near Baan Khai — a bit further south, quieter spot</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Fly%20High%20Kiteboarding%20Koh%20Phangan%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <p class="note" style="margin-top:8px;">Best wind season: January–April (steady, beginner-friendly) and July–October (stronger, for advanced riders). Baan Tai's flat lagoon is the main hub, with several IKO-certified schools.</p>
+    </div>
+
+    <div class="card" id="todo-markets">
+      <h3>Local Markets</h3>
+      <p style="font-size:12.5px;color:var(--ink-soft);margin:0 0 10px;">Some only open on specific days — check before you go.</p>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>Mama Market</b><span>Closest — Sri Thanu, walking distance from Zen Beach. Open daily, 4–11 PM, healthy &amp; vegetarian focus</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Mama%20Market%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>Chaloklum Sunday Market</b><span>Chaloklum pier, north of the villa. Sundays only, evening, ocean views and live music</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Chaloklum%20Sunday%20Market%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">3</div><div class="li-text"><b>Thong Sala Walking Street</b><span>Thong Sala. Saturdays only, evening — food, crafts and local artwork</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Thong%20Sala%20Walking%20Street%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">4</div><div class="li-text"><b>Pantip Market</b><span>Thong Sala. Open daily, 5–9 PM, wide choice of Thai &amp; international food</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Pantip%20Market%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">5</div><div class="li-text"><b>Phangan Food Court</b><span>Thong Sala. Open daily, 11 AM–9 PM, indoor seating</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Phangan%20Food%20Court%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">6</div><div class="li-text"><b>Koh Phangan Art Market</b><span>At Siam Healing Centre, Thong Sala — art &amp; craft market with live music, food and local designers, held periodically (check the day before you go)</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Siam%20Healing%20Centre%20Art%20Market%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">7</div><div class="li-text"><b>Vintage Night Market</b><span>Furthest — Baan Tai. Open daily, 11 AM–11 PM, live music most evenings</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Vintage%20Night%20Market%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    </div>
+
+    <div class="card" id="todo-massage">
+      <h3>Massage</h3>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>Revive Massage</b><span>Sri Thanu — closest, highly rated by guests for its therapists</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Revive%20Massage%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>Kanda Massage</b><span>Near Panthip Night Market, Thong Sala</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Kanda%20Massage%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">3</div><div class="li-text"><b>Ple's Massage</b><span>Thong Sala — well-reviewed local option</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Ple%27s%20Massage%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">4</div><div class="li-text"><b>Tanaporn Massage House</b><span>Ban Tai</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Tanaporn%20Massage%20House%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">5</div><div class="li-text"><b>Lavella Spa</b><span>Ban Tai, on the main street</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Lavella%20Spa%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <p class="note" style="margin-top:8px;">We don't have a trusted in-villa/home massage service to recommend. If you do book a mobile therapist to come to the villa, please make sure oils and other products don't stain or permanently damage our sheets and towels.</p>
+    </div>
+
+    <div class="card" id="todo-muaythai">
+      <h3>Muay Thai</h3>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>Phangan Muay Thai &amp; Fitness Gym</b><span>Thong Sala — the island's first &amp; largest camp, programmes for all levels</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Phangan%20Muay%20Thai%20and%20Fitness%20Gym%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>Chinnarach Muay Thai Gym</b><span>Thong Sala — open-air gym founded by two-time world champion Master Chin</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Chinnarach%20Muay%20Thai%20Gym%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">3</div><div class="li-text"><b>Diamond Muay Thai</b><span>Nai Wok, near Thong Sala — well-established camp known for technical training</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Diamond%20Muay%20Thai%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">4</div><div class="li-text"><b>Jomhod Muay Thai Training Center</b><span>Ko Pha-ngan sub-district — traditional-style training, all levels welcome</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Jomhod%20Muay%20Thai%20Training%20Center%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">5</div><div class="li-text"><b>Venom Muay Thai Gym</b><span>Ban Tai, about 100m from the beach — a bit further</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Venom%20Muay%20Thai%20Gym%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    </div>
+
+    <div class="card" id="todo-paddle">
+      <h3>Padel</h3>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>RTF Padel Club</b><span>Hin Kong Rd — the closest option, modern courts with panoramic views</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=RTF%20Padel%20Club%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>Zen Padel Phangan</b><span>Near Zen Beach, Sri Thanu — padel courts, cafe &amp; pro shop</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Zen%20Padel%20Phangan%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">3</div><div class="li-text"><b>Oxygen Sport Village</b><span class="placeholder">[area to confirm] — padel &amp; tennis courts, coaching available</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Oxygen%20Sport%20Village%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    </div>
+
+    <div class="card" id="todo-shopping">
+      <h3>Shopping</h3>
+      <p style="font-size:13.5px;margin:0;">Shops and souvenirs are mostly found in Thong Sala, the island's main town, and in the village of Sri Thanu. You'll also find souvenir stalls at local markets, such as Walking Street in Thong Sala.</p>
+    </div>
+
+    <div class="card" id="todo-sup">
+      <h3>SUP &amp; Kayak</h3>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>Kite Club Koh Phangan</b><span>Ban Tai — SUP board &amp; kayak rentals by the hour or day, boards for all levels</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Kite%20Club%20Koh%20Phangan%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>Breeze Surf Club</b><span>Ban Tai — hourly or daily SUP &amp; kayak rentals, lessons and SUP yoga, island-wide delivery available</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Breeze%20Surf%20Club%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">3</div><div class="li-text"><b>Sea Clear Kayak &amp; SUP</b><span>Thong Nai Pan Yai — beachfront kayak &amp; SUP rental, furthest option, on the east side of the island</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Sea%20Clear%20Kayak%20%26%20SUP%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    </div>
+
+    <div class="card" id="todo-temples">
+      <h3>Temples</h3>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>Wat Paa Sang Tham</b><span>Set in the forest between Thong Sala and Chaloklum — known for its golden rock nestled in the jungle</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Wat%20Paa%20Sang%20Tham%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>Chinese Temple (Guan Yin)</b><span>On a hill near Chaloklum — the island's most photogenic temple, with bright red and green rooftops</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Chinese%20Temple%20Guan%20Yin%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">3</div><div class="li-text"><b>Wat Chaloklum</b><span>Chaloklum village, north coast — a local favorite, home to well-known resident monk Luang Por Chan</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Wat%20Chaloklum%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">4</div><div class="li-text"><b>Wat Phu Khao Noi</b><span>On a small hill near Thong Sala hospital — the oldest temple on the island, founded around 1400</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Wat%20Phu%20Khao%20Noi%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">5</div><div class="li-text"><b>Wat Khao Tham</b><span>Baan Tai village, near Thong Sala — hosts meditation retreats and offers lovely sunset views</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Wat%20Khao%20Tham%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    </div>
+
+    <div class="card" id="todo-cooking">
+      <h3>Thai Cooking Classes</h3>
+      <p class="note" style="margin:0;">Addresses coming soon.</p>
+    </div>
+
+    <div class="card" id="todo-treks">
+      <h3>Treks</h3>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>Dom Sila Viewpoint &amp; Phaeng Waterfall Trek</b><span>Closest — central island, easy-medium, ~1–1.5h with a swimming stop at the waterfall pools</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Dom%20Sila%20Viewpoint%20%26%20Phaeng%20Waterfall%20Trek%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>Khao Ra Summit Trek</b><span>Central island, to the highest peak (627m) — medium-high difficulty, ~1.5–2h to the top</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Khao%20Ra%20Summit%20Trek%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">3</div><div class="li-text"><b>Haad Khom Viewpoint</b><span>Northern area near Chaloklum Bay — easy, short 20-minute climb to a sunset spot</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Haad%20Khom%20Viewpoint%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">4</div><div class="li-text"><b>Bottle Beach Trail &amp; Viewpoint</b><span>Northern coast near Haad Khom — medium to challenging, ~2–2.5h, coastal or jungle route</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Bottle%20Beach%20Trail%20%26%20Viewpoint%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">5</div><div class="li-text"><b>Haad Yuan Hike</b><span>Furthest — starts from Haad Rin on the southeast coast, steep and challenging, ~2.5h</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Haad%20Yuan%20Hike%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    </div>
+
+    <div class="card" id="todo-viewpoints">
+      <h3>Viewpoints</h3>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>Haad Son Viewpoint</b><span>Closest — west coast, sea views and a sunset bar over Koh Raham</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Haad%20Son%20Viewpoint%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>Chinese Temple Viewpoint</b><span>Between Thong Sala and Chaloklum, views over Chaloklum Bay</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Chinese%20Temple%20Viewpoint%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">3</div><div class="li-text"><b>Dom Sila Viewpoint</b><span>Near Phaeng Waterfall, panoramic views of the island and Koh Samui</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Dom%20Sila%20Viewpoint%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">4</div><div class="li-text"><b>Khao Ra</b><span>The island's highest peak, best for sunrise/sunset — furthest, central</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Khao%20Ra%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    </div>
+
+    <div class="card" id="todo-waterfalls">
+      <h3>Waterfalls</h3>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>Wang Sai Waterfall</b><span>Closest — near Mae Haad, short walk from the beach</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Wang%20Sai%20Waterfall%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>Phaeng Waterfall</b><span>The island's largest, in two parts (Phaeng Noi &amp; Phaeng Yai), more central</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Phaeng%20Waterfall%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">3</div><div class="li-text"><b>Than Nam Rak Waterfall</b><span>Peaceful spot near Baan Domsila, central area</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Than%20Nam%20Rak%20Waterfall%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">4</div><div class="li-text"><b>Sramanora &amp; Than Sadet Waterfalls</b><span>Furthest — Ban Tai area, southeast side of the island</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Sramanora%20%26%20Than%20Sadet%20Waterfalls%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    </div>
+
+    <div class="card" id="todo-wellness">
+      <h3>Wellness</h3>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>Orion Healing Centre</b><span>Sri Thanu — sound healing &amp; detox programmes, 500–800 THB</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Orion%20Healing%20Centre%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>Pure Relax Spa (Sri Thanu branch)</b><span>Closest — right in Sri Thanu, popular spa chain, Thai massage &amp; spa packages</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Pure%20Relax%20Spa%20%28Sri%20Thanu%20branch%29%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">3</div><div class="li-text"><b>The Healthlab</b><span>Recovery &amp; contrast therapy centre — wood-burning &amp; infrared saunas, ice baths, mineral baths</span></div><a class="map-btn" href="https://maps.app.goo.gl/sTzw1KCo1ZSzGVfY6" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    
+      <div class="list-item"><div class="li-num">4</div><div class="li-text"><b>AUM Phangan</b><span>Wang Takien, Sri Thanu — sound healing &amp; sauna sanctuary, nightly ceremonies</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=AUM%20Phangan%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">5</div><div class="li-text"><b>Gaia Nature Spa</b><span>Sri Thanu — herbal steam sauna (organic local herbs) &amp; cold plunge</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Gaia%20Nature%20Spa%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    </div>
+
+    <div class="card" id="todo-yoga">
+      <h3>Yoga</h3>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>The Yoga Retreat Koh Phangan</b><span>Sri Thanu — Hatha &amp; Yoga Nidra, from 350 THB/class</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=The%20Yoga%20Retreat%20Koh%20Phangan%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>Samma Karuna</b><span>Sri Thanu — Vinyasa &amp; trauma-informed yoga, from 400 THB/class</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Samma%20Karuna%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">3</div><div class="li-text"><b>Samahita Retreat</b><span>Sri Thanu — pranayama, Yin Yoga &amp; meditation, from 600 THB/class</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Samahita%20Retreat%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    
+      <div class="list-item"><div class="li-num">4</div><div class="li-text"><b>Ananda Yoga Phangan</b><span>Hin Kong — right by the villa</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Ananda%20Yoga%20Phangan%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">5</div><div class="li-text"><b>Genesis Phangan</b><span>Sri Thanu</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Genesis%20Phangan%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">6</div><div class="li-text"><b>Gaia Yogashala</b><span>Sri Thanu — yoga school with its own nature spa on site</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Gaia%20Yogashala%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">7</div><div class="li-text"><b>One Yoga Koh Phangan</b><span>Sri Thanu, beachfront studio</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=One%20Yoga%20Koh%20Phangan%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    </div>
+  </section>
+
+  <!-- ============ PLACES TO EAT ============ -->
+  <section id="eat" class="screen">
+    <p class="eyebrow">Our Favourites</p>
+    <h1 class="hero-title">Places to Eat</h1>
+    <p class="note" style="margin:-8px 0 10px;">Ordered from closest to furthest from the villa. These are some of the island's best-known spots, listed here for guidance only — there are plenty more restaurants on Koh Phangan well worth discovering during your stay.</p>
+    <div class="subnav">
+      <a href="#eat-thai">Thai</a>
+      <a href="#eat-cafes">Cafes</a>
+      <a href="#eat-veg">Vegetarian &amp; Vegan</a>
+      <a href="#eat-intl">International</a>
+    </div>
+
+    <div class="card" id="eat-thai">
+      <h3>Thai</h3>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>Pom Pui</b><span>Sri Thanu — closest</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Pom%20Pui%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>Mama Pooh's Kitchen</b><span>Sri Thanu</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Mama%20Pooh%27s%20Kitchen%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">3</div><div class="li-text"><b>Mamma Kop</b><span>Hin Kong / Sri Thanu</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Mamma%20Kop%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">4</div><div class="li-text"><b>JJ's Resort and Restaurant</b><span>Hin Kong</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=JJ%27s%20Resort%20and%20Restaurant%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">5</div><div class="li-text"><b>Ying Ying's Kitchen</b><span>Haad Yao</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Ying%20Ying%27s%20Kitchen%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">6</div><div class="li-text"><b>Nahm Talay (Zama Resort)</b><span>Haad Yao</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Nahm%20Talay%20%28Zama%20Resort%29%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">7</div><div class="li-text"><b>Baan Boontum Somtum and Gallery</b><span>Thong Sala</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Baan%20Boontum%20Somtum%20and%20Gallery%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">8</div><div class="li-text"><b>Kao Kah Moo</b><span>Thong Sala</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Kao%20Kah%20Moo%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">9</div><div class="li-text"><b>Nong View Restaurant</b><span>Baan Kai</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Nong%20View%20Restaurant%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">10</div><div class="li-text"><b>Jimmy's Thai Food</b><span>Baan Tai — furthest</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Jimmy%27s%20Thai%20Food%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    </div>
+
+    <div class="card" id="eat-cafes">
+      <h3>Cafes</h3>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>Deli Devi</b><span>Sri Thanu — closest, plant-based cafe with vegan cheeses, raw chocolates &amp; specialty lattes</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Deli%20Devi%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>Indigo Cafe &amp; Bakery</b><span>Hin Kong — specialty coffee &amp; bakery, popular for coworking</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Indigo%20Specialty%20Coffee%20and%20Bakery%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">3</div><div class="li-text"><b>The Art Cafe</b><span>Sri Thanu</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=The%20Art%20Cafe%20Koh%20Phangan%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">4</div><div class="li-text"><b>Chocolove</b><span>Hin Kong</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Chocolove%20Koh%20Phangan%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">5</div><div class="li-text"><b>Balance Specialty Coffee</b><span>Thong Sala</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Balance%20Specialty%20Coffee%20Koh%20Phangan%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">6</div><div class="li-text"><b>Fat Cat Coffee &amp; More</b><span>Thong Sala, at the Walking Street Market</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Fat%20Cat%20Coffee%20and%20More%20Koh%20Phangan%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">7</div><div class="li-text"><b>Hundred Islands Coffee Bar</b><span>Ban Tai</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Hundred%20Islands%20Coffee%20Bar%20Koh%20Phangan%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">8</div><div class="li-text"><b>Sage Koh Phangan</b><span>Ban Tai — a bit further</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Sage%20Koh%20Phangan%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    </div>
+
+    <div class="card" id="eat-veg">
+      <h3>Vegetarian &amp; Vegan</h3>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>Eat.co</b><span>Sri Thanu — closest</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Eat.co%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>Pure Vegan Heaven</b><span>Sri Thanu</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Pure%20Vegan%20Heaven%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">3</div><div class="li-text"><b>Taboon</b><span>Sri Thanu — Middle Eastern, vegetarian</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Taboon%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">4</div><div class="li-text"><b>Chana Masala</b><span>Sri Thanu — Indian, vegetarian</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Chana%20Masala%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">5</div><div class="li-text"><b>Karma Kafe</b><span>Sri Thanu — smoothie bowls</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Karma%20Kafe%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">6</div><div class="li-text"><b>Art Café</b><span>Sri Thanu</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Art%20Caf%C3%A9%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">7</div><div class="li-text"><b>Taste From Heaven</b><span>Sri Thanu — Thai, plant-based</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Taste%20From%20Heaven%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">8</div><div class="li-text"><b>Big Mountain</b><span>Sri Thanu — hilltop, vegan breakfast</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Big%20Mountain%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">9</div><div class="li-text"><b>Ying Ying's Kitchen</b><span>Haad Yao — vegan adaptations</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Ying%20Ying%27s%20Kitchen%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">10</div><div class="li-text"><b>Khunpen Vegetarian Food</b><span>Thong Sala — furthest</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Khunpen%20Vegetarian%20Food%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    </div>
+
+    <div class="card" id="eat-intl">
+      <h3>International</h3>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>Belgian Beer Bistro</b><span>Sri Thanu — closest</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Belgian%20Beer%20Bistro%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>Bubbas</b><span>Sri Thanu — café/breakfast</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Bubbas%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">3</div><div class="li-text"><b>Rimmini</b><span>Chaloklum — Italian</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Rimmini%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">4</div><div class="li-text"><b>Jenni's / Café dela Mocha</b><span>Chaloklum — Italian</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Jenni%27s%20/%20Caf%C3%A9%20dela%20Mocha%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">5</div><div class="li-text"><b>Keif</b><span>Chaloklum — breakfast</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Keif%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">6</div><div class="li-text"><b>Mandalino</b><span>Thong Sala — Italian</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Mandalino%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">7</div><div class="li-text"><b>Beachlounge</b><span>Thong Sala Beach — French/Thai fusion</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Beachlounge%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">8</div><div class="li-text"><b>Ando's Burgers</b><span>Thong Sala</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Ando%27s%20Burgers%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">9</div><div class="li-text"><b>Ando Loco</b><span>Thong Sala — Mexican</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Ando%20Loco%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">10</div><div class="li-text"><b>A's Famous</b><span>Thong Sala — American diner, furthest</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=A%27s%20Famous%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    </div>
+  </section>
+
+  <!-- ============ PLACES TO DRINK ============ -->
+  <section id="drink" class="screen">
+    <p class="eyebrow">Sunset Spots</p>
+    <h1 class="hero-title">Places to Drink</h1>
+    <p class="note" style="margin:-8px 0 10px;">Ordered from closest to furthest from the villa. These are some of the island's best-known spots, listed here for guidance only — there are plenty more bars on Koh Phangan well worth discovering during your stay.</p>
+
+    <div class="card">
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>L'Alcove</b><span>Hin Kong — closest</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=L%27Alcove%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>Charlie's</b><span>Hin Kong, right by L'Alcove</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Charlie%27s%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">3</div><div class="li-text"><b>Castaway</b><span>Hin Kong, right by L'Alcove</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Castaway%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">4</div><div class="li-text"><b>Amsterdam Bar</b><span>Wok Tum / Hin Kong</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Amsterdam%20Bar%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">5</div><div class="li-text"><b>Swenglish Bar</b><span>Hin Kong road</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Swenglish%20Bar%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">6</div><div class="li-text"><b>Zen Beach Bar</b><span>Sri Thanu</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Zen%20Beach%20Bar%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">7</div><div class="li-text"><b>Bluerama</b><span>Nai Wok Beach — hilltop bar</span></div><a class="map-btn" href="https://maps.app.goo.gl/zYtNheG4qZSvUuht6" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">8</div><div class="li-text"><b>Secret Beach Bar</b><span>Haad Son, west coast — sunset views</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Secret%20Beach%20Bar%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">9</div><div class="li-text"><b>Coral Bar</b><span>Haad Yao</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Coral%20Bar%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">10</div><div class="li-text"><b>Three Sixty Bar</b><span>Mae Haad, north</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Three%20Sixty%20Bar%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">11</div><div class="li-text"><b>Twisted Village</b><span>Chaloklum</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Twisted%20Village%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">12</div><div class="li-text"><b>Soho</b><span>Thong Sala</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Soho%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">13</div><div class="li-text"><b>The Ugly Duckling</b><span>Thong Sala, Soi Krungthai</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=The%20Ugly%20Duckling%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">14</div><div class="li-text"><b>Sabaii Bay</b><span>Ban Tai</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Sabaii%20Bay%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">15</div><div class="li-text"><b>The Jam Bar</b><span>Recently relocated to Maduwan, further from the villa</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=The%20Jam%20Bar%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      
+    </div>
+  </section>
+
+  <!-- ============ PARTIES & CLUBS ============ -->
+  <section id="nightlife" class="screen">
+    <p class="eyebrow">After Dark</p>
+    <h1 class="hero-title">Parties &amp; Clubs</h1>
+    <p class="note" style="margin:-8px 0 10px;">Ordered from closest to furthest from the villa.</p>
+
+    <div class="card">
+      <p class="note" style="margin:0 0 10px;">Koh Phangan is well known for its parties and events, and the list below is provided for guidance only. Many venues run events on specific days of the week, so for the most up-to-date schedule, we'd recommend checking <a href="https://phangan.events/" target="_blank" rel="noopener" style="color:var(--ink);font-weight:600;">phangan.events</a>.</p>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>Holy Stone</b><span>In the hills above Sri Thanu, near a lake — the closest option</span></div><a class="map-btn" href="https://maps.app.goo.gl/pMbpeaPnTpMokDzQ7" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>Bluerama</b><span>Nai Wok Beach — sunset events</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Bluerama%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">3</div><div class="li-text"><b>Merkaba Sunset Beach Club</b><span>Ban Khai, south coast — sunset lounge &amp; events</span></div><a class="map-btn" href="https://maps.app.goo.gl/QcQyLmgNtka1jFjG8" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">4</div><div class="li-text"><b>Rasta Home</b><span>Ban Tai — ongoing, chill vibes</span></div><a class="map-btn" href="https://maps.app.goo.gl/jY4JbPCBmYWCtnBp7" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">5</div><div class="li-text"><b>Sabaii Bay Beach Club</b><span>Ban Tai — Friday night DJ sets, infinity pool</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Sabaii%20Bay%20Beach%20Club%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">6</div><div class="li-text"><b>Jungle Experience</b><span>Ban Tai jungle — 1–2 days before full moon</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Jungle%20Experience%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">7</div><div class="li-text"><b>Half Moon Festival</b><span>Ban Tai jungle — around the half-moon, 1 week before/after full moon</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Half%20Moon%20Festival%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">8</div><div class="li-text"><b>Waterfall Festival</b><span>Ban Tai jungle, near Phaeng Waterfall — event built around a jungle waterfall</span></div><a class="map-btn" href="https://maps.app.goo.gl/UTeQRuMAWM1fiTMw5" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">9</div><div class="li-text"><b>OXA</b><span>Near Haad Rin — techno &amp; progressive house</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=OXA%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">10</div><div class="li-text"><b>Full Moon Party</b><span>Haad Rin Beach — every full moon, the island's iconic party</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Full%20Moon%20Party%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">11</div><div class="li-text"><b>Guy's Bar</b><span>Haad Yuan — Fridays, deep house, cliffside jungle setting</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Guy%27s%20Bar%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">12</div><div class="li-text"><b>Eden Garden</b><span>Haad Yuan — Saturdays, electronic music, sunrise sessions</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Eden%20Garden%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">13</div><div class="li-text"><b>Chill UP Club</b><span>Further east — check current event dates</span></div><a class="map-btn" href="https://maps.app.goo.gl/taZWPfnxPeAQU9E79" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">14</div><div class="li-text"><b>Retro Mountain Jungle Club</b><span>Further east, jungle venue — check current event dates</span></div><a class="map-btn" href="https://maps.app.goo.gl/aa5Ld73k3HFNE7pH8" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">15</div><div class="li-text"><b>Utopia</b><span>Further east — check current event dates</span></div><a class="map-btn" href="https://maps.app.goo.gl/GF1aSirLGAP8cC5FA" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">16</div><div class="li-text"><b>Lighthouse</b><span>Furthest of the group, near Haad Rin — check current event dates</span></div><a class="map-btn" href="https://maps.app.goo.gl/KdaopUuVpHZStD3KA" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    </div>
+  </section>
+
+  <!-- ============ HOUSE RULES ============ -->
+  <section id="rules" class="screen">
+    <p class="eyebrow">Please Respect</p>
+    <h1 class="hero-title">House Rules</h1>
+    <p style="font-size:13.5px;color:var(--ink-soft);margin:-8px 0 18px;">We've kept our house rules simple — they're here to help us look after this home so it stays just as special for the next guests as it is for you. Thank you in advance for respecting them during your stay!</p>
+    <div class="card">
+      <div class="badge-row">
+        <span class="badge no">No smoking indoors</span>
+        <span class="badge no">No parties/events</span>
+        <span class="badge no">No pets</span>
+        <span class="badge">Max guests: 6</span>
+        <span class="badge">Quiet hours: 10PM–8AM</span>
+      </div>
+    </div>
+
+    <p class="eyebrow" style="margin:18px 0 10px;">Other Things to Note</p>
+
+    <div class="card">
+      <h3>Housekeeping</h3>
+      <p style="font-size:13.5px;margin:0 0 10px;">Housekeeping is included once a week. If you'd like extra cleaning during your stay, just ask — it can be arranged for 500 THB/hour, plus the cost of cleaning any additional sheets and towels used.</p>
+      <p style="font-size:13.5px;margin:0;">Please note that we don't provide extra linen between the weekly cleanings. You're welcome to request some — the associated cleaning cost will simply be added.</p>
+    </div>
+    <div class="card">
+      <h3>Towels &amp; Pool</h3>
+      <p style="font-size:13.5px;margin:0 0 10px;">We provide towels for both the bathroom and the pool — the white ones are for the bathroom, and the colored ones are for the pool. Please don't take any of them to the beach, use them to clean up spills or food, or use them to remove makeup, to avoid permanent damage.</p>
+      <p style="font-size:13.5px;margin:0 0 10px;">If you've been to the beach, please rinse off with a shower before using the pool — this helps keep sand out of the pool and prevents damage to the filtration system.</p>
+      <p style="font-size:13.5px;margin:0;">We kindly ask that you take care of the towels during your stay — if any come back damaged or permanently stained, we'll have to ask you to cover the cost of replacing them.</p>
+    </div>
+    <div class="card">
+      <h3>Bedding</h3>
+      <p style="font-size:13.5px;margin:0 0 10px;">Please be mindful not to stain the sheets with temporary or permanent tattoos, body oil, or sunscreen — these can permanently damage the bedding.</p>
+      <p style="font-size:13.5px;margin:0;">The same goes here — if the sheets end up damaged beyond cleaning, we'll kindly ask you to cover the replacement cost. We really appreciate your care!</p>
+    </div>
+
+    <div class="card">
+      <h3>Furniture &amp; Sinks</h3>
+      <p style="font-size:13.5px;margin:0 0 10px;">The villa's indoor furniture is custom-made from valuable wood, so we kindly ask you not to move it around. In the event of damage, we'll have to ask you to cover the cost of repair or replacement.</p>
+      <p style="font-size:13.5px;margin:0 0 10px;">The sinks are made of polished cement — please don't use them for laundry or other chemical products, as detergents can permanently damage both the cement and the plumbing.</p>
+      <p style="font-size:13.5px;margin:0;">Likewise, if you shave or cut your hair, please dispose of the trimmings in the bins provided rather than rinsing them down the drain, to avoid blocking the pipes. Thank you for your understanding!</p>
+    </div>
+    <div class="card">
+      <h3>Noise Disturbances</h3>
+      <p style="font-size:13.5px;margin:0 0 10px;">We hope you'll enjoy your stay and make the most of your time at the villa! We're located in a residential area, surrounded by neighbours who also call this place home. In the neighbourhood, there have been times when gatherings, parties or excessively loud music created disturbances, and on occasion, this led to neighbours calling the police — something we'd naturally rather avoid. We appreciate your mindfulness in this regard.</p>
+      <p style="font-size:13.5px;margin:0;">If you're ever disturbed by noise from the neighbours, particularly during quiet hours, please let us know — we'll be glad to remind them to be mindful of their noise as well.</p>
+    </div>
+  </section>
+
+  <!-- ============ EMERGENCY ============ -->
+  <section id="emergency" class="screen">
+    <p class="eyebrow">Please Call In An Emergency</p>
+    <h1 class="hero-title">Emergency</h1>
+    <p class="note" style="margin:-8px 0 10px;">We strongly encourage you to save the numbers below in your phone so they're on hand without delay if needed. It's also a good idea to keep your insurance details and emergency contacts easily accessible during your stay.</p>
+    <div class="card">
+      <div class="kv"><span class="k">Host / Manager</span><span class="v">Jan — +66 93 434 3221</span></div>
+      <div class="kv"><span class="k">Tourist Police</span><span class="v">1155</span></div>
+      <div class="kv"><span class="k">Ambulance</span><span class="v">1669</span></div>
+      <div class="kv"><span class="k">Police / Fire</span><span class="v">191</span></div>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <h3>Nearest Hospital</h3>
+      <div class="kv"><span class="k">Koh Phangan Government Hospital — ~10 min drive</span><span class="v">077-377-254</span></div>
+      <p style="font-size:13.5px;margin:10px 0 0;">This public hospital offers good quality care, but with more limited resources — it's well suited for minor issues. For more serious emergencies or accidents, it's best to head straight to Phangan International Hospital / Bangkok Hospital instead.</p>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <h3>International Hospital</h3>
+      <div class="kv"><span class="k">Phangan International Hospital / Bangkok Hospital — ~40 min drive</span><span class="v">077-429-559</span></div>
+      <p style="font-size:13.5px;margin:10px 0 0;">There are other hospitals on the island, but Phangan International Hospital / Bangkok Hospital is the one we recommend for the quality of its care — we'd encourage you to head there in case of a serious health issue or accident. If an ambulance tries to refer you to a different hospital, please insist on being taken to Phangan International Hospital / Bangkok Hospital instead.</p>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <h3>In Case of an Accident or Major Health Issue at the Villa</h3>
+      <p style="font-size:13.5px;margin:0;">If an accident or a major health issue happens at the villa, please contact the appropriate emergency services first. Alongside this, don't hesitate to reach out to us as well — we may be able to help, for instance by directing an ambulance to the villa or assisting with your care.</p>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <h3>On the phone with a hospital</h3>
+      <p style="font-size:13.5px;margin:0 0 10px;">If you ever need to call a hospital or ambulance, please try to stay as calm as possible — it genuinely helps the person on the other end assist you faster. When you get through, try to clearly give, in this order:</p>
+      <ul class="checklist" style="margin-bottom:10px;">
+        <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M4 12l5 5L20 6"/></svg></span> Your exact location — the villa address (see "Directions") and, if useful, your phone number</li>
+        <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M4 12l5 5L20 6"/></svg></span> What happened and how many people are affected</li>
+        <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M4 12l5 5L20 6"/></svg></span> The person's condition — are they conscious, breathing, bleeding?</li>
+        <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M4 12l5 5L20 6"/></svg></span> Stay on the line and follow their instructions until help arrives</li>
+      </ul>
+      <p style="font-size:13.5px;margin:0;">Please also note that private hospitals in Thailand will usually ask for your travel/medical insurance details before starting treatment, so it's worth keeping your policy number and provider's contact easily accessible during your stay. Guests without valid medical insurance will kindly be referred to the public hospital (Koh Phangan Government Hospital), where care remains available to everyone.</p>
+    </div>
+  </section>
+
+  <!-- ============ LOCAL DIRECTORY ============ -->
+  <section id="directory" class="screen">
+    <p class="eyebrow">Nearby</p>
+    <h1 class="hero-title">Local Directory</h1>
+
+    <div class="subnav">
+      <a href="#dir-convenience">Convenience Stores</a>
+      <a href="#dir-delivery">Home Delivery</a>
+      <a href="#dir-atms">ATMs</a>
+      <a href="#dir-supermarkets">Supermarkets</a>
+      <a href="#dir-pharmacies">Pharmacies</a>
+      <a href="#dir-fuel">Gas Stations</a>
+    </div>
+
+    <div class="card" id="dir-convenience">
+      <h3>Convenience Stores</h3>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>JanJan Healthy Store</b><span>Closest of all — health &amp; convenience store</span></div><a class="map-btn" href="https://maps.app.goo.gl/GLxVy1kQGUhFTrUh9" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>7-Eleven — Sri Thanu Bay</b><span>Closest — a few minutes from the villa, open 24 hours</span></div><a class="map-btn" href="https://maps.app.goo.gl/RPMDuAXo14jjrS2E9" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">3</div><div class="li-text"><b>7-Eleven — near Thong Sala</b><span>Open 24 hours, a little further</span></div><a class="map-btn" href="https://maps.app.goo.gl/vpvnP5wnv356YzbD7" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">4</div><div class="li-text"><b>7-Eleven — near Thong Sala</b><span>Open 24 hours, a little further</span></div><a class="map-btn" href="https://maps.app.goo.gl/vpvnP5wnv356YzbD7" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">5</div><div class="li-text"><b>Sakchai Minimart</b><span>Sri Thanu — open until 9 PM</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Sakchai%20Minimart%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">6</div><div class="li-text"><b>Unpacked (เติมเต็ม)</b><span>Sri Thanu — organic &amp; refill store, open until 6 PM</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Unpacked%20%28%E0%B9%80%E0%B8%95%E0%B8%B4%E0%B8%A1%E0%B9%80%E0%B8%95%E0%B9%87%E0%B8%A1%29%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">7</div><div class="li-text"><b>Tops Daily</b><span>Tharue Woktum — furthest of the group</span></div><a class="map-btn" href="https://maps.app.goo.gl/gsrZnT8Mg9zxBLqB8" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    </div><div class="card" id="dir-delivery">
+      <h3>Home Delivery</h3>
+      <p style="font-size:13.5px;margin:0 0 10px;">On Koh Phangan, the only home delivery service available is <b>Delivery KPG</b> — they partner with over 300 restaurants across the island, covering everything from pizza and burgers to Thai food, seafood and vegan options. Beyond restaurants, they also deliver groceries and can pick up items from pharmacies.</p>
+      <p style="font-size:13.5px;margin:0 0 10px;">Orders are placed through their app (iOS &amp; Android), registered with a Thai or WhatsApp number. Deliveries typically take around 45 minutes, and both cash and QR code payments are accepted.</p>
+      <p style="font-size:13.5px;margin:0 0 10px;">When placing an order, you can give the villa's address and GPS point found in the <b>Directions</b> section to help the driver find us.</p>
+      <div class="list-item"><div class="li-text"><b>Delivery KPG</b><span>Daily, 8 AM–11:45 PM — WhatsApp +66 63 678 2760</span></div><a class="map-btn" href="https://www.phangan-delivery.com/" target="_blank" rel="noopener" aria-label="Visit website"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg></a></div>
+    </div>
+
+    <div class="card" id="dir-atms">
+      <h3>ATMs</h3>
+      <p class="note" style="margin:0 0 10px;">The three closest ATMs to the villa — you'll also find plenty more easily around the island.</p>
+      <p style="font-size:13.5px;margin:0 0 10px;">A quick note on Thai ATMs: unlike in many countries, the machine returns your card only after dispensing the cash, so please remember to take it before walking away.</p>
+      <p style="font-size:13.5px;margin:0 0 10px;">If you do forget your card in the machine, there's usually a phone number on the ATM you can call to report it. The bank typically takes 2–3 days to retrieve the card, after which it can be collected from their main branch on Koh Phangan.</p>
+      <div class="list-item"><div class="li-text"><b>Krungsri ATM</b><span>At 7-Eleven, Sri Thanu Bay — closest</span></div><a class="map-btn" href="https://maps.app.goo.gl/QLMc3qBqpGPaYdCL9" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-text"><b>Krungsri Bank ATM</b><span>At 7-Eleven, Haad Hin Kong</span></div><a class="map-btn" href="https://maps.app.goo.gl/5TqhmdSgLv77UCsj9" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-text"><b>Krungsri ATM</b><span>Near Thong Sala — furthest of the three</span></div><a class="map-btn" href="https://maps.app.goo.gl/8UdcETEHdEXLonFCA" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    </div>
+
+    <div class="card" id="dir-supermarkets">
+      <h3>Supermarkets</h3>
+      <p class="note" style="margin:0 0 10px;">These are all in or near Thong Sala.</p>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>Tesco Lotus</b><span>Heart of Thong Sala — fresh produce, hygiene products</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Tesco%20Lotus%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>Big C</b><span>Main Baan Tai road towards Thong Sala — groceries, also hosts a market Mon/Wed/Fri</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Big%20C%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">3</div><div class="li-text"><b>Fresh Market Thong Sala</b><span>Daily market in the main town — fresh produce, fish, meat</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Fresh%20Market%20Thong%20Sala%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">4</div><div class="li-text"><b>Makro</b><span>Thong Sala — wholesale, widest selection of international ingredients</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Makro%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    
+      <div class="list-item"><div class="li-num">5</div><div class="li-text"><b>Tops Phangan</b><span>Furthest of the group</span></div><a class="map-btn" href="https://maps.app.goo.gl/PGY2yem9G5EHjkgg8" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    </div>
+
+    <div class="card" id="dir-pharmacies">
+      <h3>Pharmacies</h3>
+      <p class="note" style="margin:0 0 10px;">All within a short distance of Sri Thanu.</p>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>Tropica Pharmacy</b><span>Open until 8 PM — 088 799 5233</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Tropica%20Pharmacy%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>First Time Pharmacy</b><span>Open until 11 PM — 065 665 4985</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=First%20Time%20Pharmacy%202%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">3</div><div class="li-text"><b>The Chemist Pharmacy</b><span>Open until 11 PM — 077 962 265</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=The%20Chemist%20Pharmacy%202%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">4</div><div class="li-text"><b>Medicasa Pharmacy</b><span>Open until 11 PM — 095 194 4409</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Medicasa%20Pharmacy%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">5</div><div class="li-text"><b>Nemo Pharmacy</b><span>Open until 10 PM, delivery available — 097 999 6490</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Nemo%20Pharmacy%202%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">6</div><div class="li-text"><b>MediLeaf Pharmacy</b><span>Open until 10 PM — 096 352 5185</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=MediLeaf%202%20Pharmacy%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    </div>
+  <div class="card" id="dir-fuel">
+      <h3>Gas Stations</h3>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>PT Gasoline</b><span>Closest to the villa</span></div><a class="map-btn" href="https://maps.app.goo.gl/uvWZ3AuC6i2Hj57q6" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>Bangchak-Phangan Agricultural Cooperative Br.2</b><span>A bit further</span></div><a class="map-btn" href="https://maps.app.goo.gl/bn2fzFqqKVvH9ZHb6" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">3</div><div class="li-text"><b>Gas Station</b><span>Furthest of the three</span></div><a class="map-btn" href="https://maps.app.goo.gl/7dvRrYdk3yLkQ5p47" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    </div>
+
+
+  </section>
+
+    <!-- ============ COWORKING SPACES ============ -->
+  <section id="coworking" class="screen">
+    <p class="eyebrow">Work &amp; Connect</p>
+    <h1 class="hero-title">Coworking Spaces</h1>
+    <p class="note" style="margin:-8px 0 10px;">Ordered from closest to furthest from the villa.</p>
+    <div class="card">
+      <h3>Coworking Spaces</h3>
+      <div class="list-item"><div class="li-num">1</div><div class="li-text"><b>Zen Beach Hub</b><span>Sri Thanu — closest, a few steps from Zen Beach, right in the heart of Sri Thanu</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Zen%20Beach%20Hub%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">2</div><div class="li-text"><b>Inner Space Coworking</b><span>Sri Thanu / Haad Chao Phao — cosy coworking space</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Inner%20Space%20Coworking%20Koh%20Phangan%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">3</div><div class="li-text"><b>Nira's Home Bakery</b><span>Thong Sala, by the pier</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Nira%27s%20Home%20Bakery%20Koh%20Phangan%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">4</div><div class="li-text"><b>Dots Coffee</b><span>Thong Sala — a bit further, central location</span></div><a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Dots%20Coffee%20Koh%20Phangan%20Koh%20Phangan" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+      <div class="list-item"><div class="li-num">5</div><div class="li-text"><b>Hustle Club Koh Phangan</b><span>Thong Sala area — coworking space &amp; community</span></div><a class="map-btn" href="https://maps.app.goo.gl/uXdoEoh4VMX5ALBo6" target="_blank" rel="noopener" aria-label="Open in Google Maps"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg></a></div>
+    </div>
+  </section>
+
+<!-- ============ CONTACT ============ -->
+  <section id="contact" class="screen" style="text-align:center;">
+    <p class="eyebrow">Enjoy Your Stay</p>
+    <div class="avatar">[photo]</div>
+    <h1 class="hero-title" style="font-size:22px;">Welcome, I'm your<br>host, Jan</h1>
+    <p style="font-size:13.5px;color:var(--ink-soft);">We're thrilled to welcome you to our home. Feel free to reach out anytime, even the smallest questions are welcome!</p>
+    <a class="btn" href="https://wa.me/66934343221">WhatsApp Jan</a>
+    <a class="btn outline" href="mailto:host@example.com">Email</a>
+    <div class="card" style="margin-top:18px;text-align:left;">
+      <div class="kv"><span class="k">Check-in</span><span class="v">2:00 PM – 7:00 PM</span></div>
+      <div class="kv"><span class="k">Check-out</span><span class="v">Before 11:00 AM</span></div>
+    </div>
+  </section>
+
+  <!-- ============ SEASONS & WEATHER ============ -->
+  <section id="seasons" class="screen">
+    <p class="eyebrow">Plan Ahead</p>
+    <h1 class="hero-title">Seasons &amp;<br>Weather</h1>
+    <div class="card">
+      <h3>Peak season — mid-December to mid-April</h3>
+      <p style="font-size:13.5px;margin:0;">The best time to visit: dry, sunny days, low humidity and calm seas. Temperatures average 28–32°C. This is the most popular period on the island, with tourism running at full capacity.</p>
+    </div>
+    <div class="card">
+      <h3>Hot season — mid-April to early July</h3>
+      <p style="font-size:13.5px;margin:0;">The hottest stretch of the year, with daytime temperatures often above 34°C and high humidity, plus the occasional storm. Quieter and better value, but pack light clothing and stay hydrated.</p>
+    </div>
+    <div class="card">
+      <h3>High season — July to August</h3>
+      <p style="font-size:13.5px;margin:0;">Mostly sunny with scattered tropical showers. Temperatures average 30–32°C. A good balance of pleasant weather and fewer crowds.</p>
+    </div>
+    <div class="card">
+      <h3>Low / wet season — September to mid-December</h3>
+      <p style="font-size:13.5px;margin:0;">The quietest and rainiest time of year, especially in October and November, with cloudier, more humid days. Temperatures stay warm at 27–30°C — rain usually comes in short bursts, and the sun often returns soon after.</p>
+    </div>
+
+    <div class="card">
+      <h3>Average temperature by month</h3>
+      <div class="season-chart">
+        <div class="bar-col"><span class="temp-label">29°</span><div class="bar" style="height:52%;background:var(--accent);"></div><span class="month-label">J</span></div>
+        <div class="bar-col"><span class="temp-label">30°</span><div class="bar" style="height:64%;background:var(--accent);"></div><span class="month-label">F</span></div>
+        <div class="bar-col"><span class="temp-label">31°</span><div class="bar" style="height:76%;background:var(--accent);"></div><span class="month-label">M</span></div>
+        <div class="bar-col"><span class="temp-label">32°</span><div class="bar" style="height:88%;background:var(--accent);"></div><span class="month-label">A</span></div>
+        <div class="bar-col"><span class="temp-label">33°</span><div class="bar" style="height:100%;background:#a1503a;"></div><span class="month-label">M</span></div>
+        <div class="bar-col"><span class="temp-label">32°</span><div class="bar" style="height:88%;background:#a1503a;"></div><span class="month-label">J</span></div>
+        <div class="bar-col"><span class="temp-label">31°</span><div class="bar" style="height:76%;background:#3f6b52;"></div><span class="month-label">J</span></div>
+        <div class="bar-col"><span class="temp-label">31°</span><div class="bar" style="height:76%;background:#3f6b52;"></div><span class="month-label">A</span></div>
+        <div class="bar-col"><span class="temp-label">29°</span><div class="bar" style="height:52%;background:#5b7d8c;"></div><span class="month-label">S</span></div>
+        <div class="bar-col"><span class="temp-label">28°</span><div class="bar" style="height:40%;background:#5b7d8c;"></div><span class="month-label">O</span></div>
+        <div class="bar-col"><span class="temp-label">28°</span><div class="bar" style="height:40%;background:#5b7d8c;"></div><span class="month-label">N</span></div>
+        <div class="bar-col"><span class="temp-label">29°</span><div class="bar" style="height:52%;background:var(--accent);"></div><span class="month-label">D</span></div>
+      </div>
+      <div class="season-legend">
+        <div class="legend-item"><span class="dot" style="background:var(--accent);"></span>Peak season</div>
+        <div class="legend-item"><span class="dot" style="background:#a1503a;"></span>Hot season</div>
+        <div class="legend-item"><span class="dot" style="background:#3f6b52;"></span>High season</div>
+        <div class="legend-item"><span class="dot" style="background:#5b7d8c;"></span>Wet season</div>
+      </div>
+      <p style="font-size:11px;color:var(--ink-soft);margin:12px 0 0;text-align:center;">Average daytime temperatures — for guidance only, actual conditions vary year to year.</p>
+    </div>
+
+    <div class="card">
+      <h3>Seasonal Travel Tips</h3>
+      <p style="font-size:13.5px;margin:0 0 10px;">Light, breathable clothing works year-round on Koh Phangan, but a few extras are worth packing depending on when you visit.</p>
+      <ul style="font-size:13.5px;margin:0 0 10px;padding-left:18px;">
+        <li style="margin-bottom:8px;"><b>Peak season (mid-December to mid-April):</b> Days are dry and sunny — sunscreen, a hat and plenty of water are your best friends. Evenings can feel slightly cooler, especially in January, so a light layer is handy for dinners out.</li>
+        <li style="margin-bottom:8px;"><b>Hot season (mid-April to early July):</b> This is the hottest stretch of the year — stick to light, loose-fitting fabrics, stay hydrated, and try to plan outdoor activities for the morning or late afternoon.</li>
+        <li style="margin-bottom:8px;"><b>High season (July to August):</b> Expect occasional short tropical showers — a light rain jacket or umbrella is worth having on hand, though the sun usually isn't far behind.</li>
+        <li><b>Low / wet season (September to mid-December):</b> Rain is more frequent, sometimes heavier — waterproof footwear or sandals, a rain jacket, and a dry bag for electronics are all useful, especially if you're getting around by scooter.</li>
+      </ul>
+      <p style="font-size:13.5px;margin:0 0 8px;">A note on mosquitoes: dengue fever is present in Thailand, with cases tending to rise during and after the rainy season (roughly August to December). Mosquito repellent, especially around dawn and dusk, is the best precaution — the villa provides mosquito coils, and we'd recommend packing a repellent with DEET or picaridin for extra peace of mind.</p>
+      <p style="font-size:13.5px;margin:0;">If you develop a high fever, joint pain or a rash during or shortly after your stay, please see a doctor and mention possible dengue exposure.</p>
+    </div>
+  </section>
+
+</div>
+
+<button class="menu-btn" id="menuBtn" onclick="showScreen('home')" aria-label="Back to menu">
+  <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-width="2"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg>
+</button>
+
+<script>
+  function showScreen(id){
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.getElementById('menuBtn').classList.toggle('show', id !== 'home');
+    window.scrollTo({top:0, behavior:'instant'});
+  }
+</script>
+
+</body>
+</html>
