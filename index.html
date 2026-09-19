@@ -1493,6 +1493,21 @@
     document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
     document.documentElement.setAttribute('lang', lang);
   }
+
+  // In-page jump links (subnav pills, "See contacts ↓" links) must only scroll
+  // to their target within the current screen. A plain <a href="#id"> triggers
+  // native browser fragment navigation, which on many mobile browsers fires a
+  // popstate event with no (or mismatched) state — our popstate listener above
+  // then falls back to the home screen. Intercepting the click and scrolling
+  // manually avoids touching the URL hash / history entirely.
+  document.addEventListener('click', function(e){
+    var link = e.target.closest('.subnav a[href^="#"], .jump-link[href^="#"]');
+    if(!link) return;
+    var targetEl = document.getElementById(link.getAttribute('href').slice(1));
+    if(!targetEl) return;
+    e.preventDefault();
+    targetEl.scrollIntoView({behavior:'smooth', block:'start'});
+  });
 </script>
 
 </body>
